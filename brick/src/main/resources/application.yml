@@ -1,0 +1,28 @@
+# Microservice configuration for brick-awesome-pizza
+spring:
+  application:
+    name: brick-awesome-pizza # Name of the microservice module
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE # In-memory H2 database URL
+    driver-class-name: org.h2.Driver # H2 database driver
+    username: sa # Default H2 username
+    password: # No password for local development
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect # Hibernate dialect for H2
+    hibernate:
+      ddl-auto: update # Update schema on startup (does not drop tables)
+    show-sql: true # Show SQL queries in logs
+    properties:
+      hibernate:
+        format_sql: true # Format SQL output for readability
+server:
+  port: 8090 # Service will run on port 8090
+
+logging:
+  level:
+    org:
+      springframework:
+        orm: DEBUG # Debug level for ORM operations
+        jdbc: DEBUG # Debug level for JDBC operations
+
+# Add other custom configurations below as needed
