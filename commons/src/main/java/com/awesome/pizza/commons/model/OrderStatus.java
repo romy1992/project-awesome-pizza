@@ -1,4 +1,4 @@
-package com.awesome.pizza.brick.entity;
+package com.awesome.pizza.commons.model;
 
 /**
  * Enum representing the status of an order in Awesome Pizza.

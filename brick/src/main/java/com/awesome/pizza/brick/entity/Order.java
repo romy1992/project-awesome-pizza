@@ -1,13 +1,16 @@
 package com.awesome.pizza.brick.entity;
 
+import com.awesome.pizza.commons.model.OrderStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 /**
- * Entity representing a customer order in Awesome Pizza.
- * Each order contains a list of pizzas and a status.
+ * Entity representing a customer order in Awesome Pizza. Each order contains a list of pizzas and a
+ * status.
  */
 @Entity
 @Table(name = "orders")
@@ -16,34 +19,34 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    /** Unique code for tracking the order */
-    private String code;
+  /** Unique code for tracking the order */
+  @Column(name = "CODE", unique = true, nullable = false, length = 50)
+  private String code;
 
-    /** Current status of the order */
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+  /** Current status of the order */
+  @Enumerated(EnumType.STRING)
+  @Column(name = "STATUS", nullable = false)
+  private OrderStatus status;
 
-    /** List of pizzas in the order */
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-        name = "order_pizzas",
-        joinColumns = @JoinColumn(name = "order_id"),
-        inverseJoinColumns = @JoinColumn(name = "pizza_id")
-    )
-    private List<Pizza> pizzas;
+  /** List of ordered pizzas (OrderPizza) */
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "order_id")
+  private List<OrderPizza> orderedPizzas;
 
-    /** Timestamp when the order was created */
-    private LocalDateTime createdAt;
+  /** Timestamp when the order was created */
+  @CreationTimestamp
+  @Column(updatable = false)
+  private LocalDateTime createdAt;
 
-    /** User associated with the order (one-to-one) */
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
+  /** User associated with the order (one-to-one) */
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-    /** True if the order is takeaway, false if pickup */
-    private boolean isTakeaway;
+  /** Total price of the order */
+  private BigDecimal totalPrice;
 }

@@ -1,5 +1,6 @@
 package com.awesome.pizza.commons.model;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.*;
 
@@ -10,8 +11,8 @@ import lombok.*;
 @Builder
 public class UserModel {
   private Long id;
-  private String name;
-  private LocalDateTime pickupFrom;
-  private LocalDateTime pickupTo;
+  @NotNull private String name;
+  @NotNull private LocalDateTime pickupFrom;
+  @NotNull private LocalDateTime pickupTo;
   private String userComment;
 }

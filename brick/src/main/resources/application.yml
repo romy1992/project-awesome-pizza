@@ -10,11 +10,16 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect # Hibernate dialect for H2
     hibernate:
-      ddl-auto: update # Update schema on startup (does not drop tables)
+      ddl-auto: create-drop # Create schema at startup, drop at shutdown
+#      ddl-auto: update Mantenimento schema tra riavvii
     show-sql: true # Show SQL queries in logs
     properties:
       hibernate:
         format_sql: true # Format SQL output for readability
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 server:
   port: 8090 # Service will run on port 8090
 
@@ -24,5 +29,3 @@ logging:
       springframework:
         orm: DEBUG # Debug level for ORM operations
         jdbc: DEBUG # Debug level for JDBC operations
-
-# Add other custom configurations below as needed

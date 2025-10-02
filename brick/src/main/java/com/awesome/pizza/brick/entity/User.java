@@ -20,14 +20,18 @@ public class User {
 	private Long id;
 
 	/** Name of the user */
+	@Column(name = "NAME", nullable = false)
 	private String name;
 
 	/** Desired pickup time range (from) */
+	@Column(name = "PICKUP_FROM", nullable = false)
 	private LocalDateTime pickupFrom;
 
 	/** Desired pickup time range (to) */
+	@Column(name = "PICKUP_TO", nullable = false)
 	private LocalDateTime pickupTo;
 
 	/** User's comment or description */
+	@Column(name = "USER_COMMENT", length = 1000)
 	private String userComment;
 }

@@ -1,17 +1,10 @@
 package com.awesome.pizza.brick.exception;
 
 import java.time.LocalDateTime;
-import lombok.Getter;
 
-@Getter
-public class ErrorResponse {
-  private final LocalDateTime timestamp;
-  private final String message;
-  private final int status;
-
-  public ErrorResponse(LocalDateTime timestamp, String message, int status) {
-    this.timestamp = timestamp;
-    this.message = message;
-    this.status = status;
-  }
-}
+/**
+ * Represents a standardized error response structure for API responses in Awesome Pizza.
+ *
+ * <p>Includes a timestamp, error message, and HTTP status code.
+ */
+public record ErrorResponse(LocalDateTime timestamp, String message, int status) {}

@@ -1,0 +1,399 @@
+{
+  "info": {
+    "_postman_id": "awesome-pizza-collection-2025",
+    "name": "Awesome Pizza API",
+    "description": "Collection API di Awesome Pizza, completa di documentazione, variabili di ambiente e script di test.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Order",
+      "description": "Tutte le API relative agli ordini.",
+      "item": [
+        {
+          "name": "Order - Crea nuovo ordine",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"name\": \"Mario Rossi\",\n    \"pickupFrom\": \"2025-10-09T12:00:00\",\n    \"pickupTo\": \"2025-10-09T13:00:00\",\n    \"userComment\": \"Potrei arrivare in ritardo\"\n  },\n  \"pizzas\": [\n    {\n      \"pizzaId\": 1,\n      \"descriptionUser\": \"Senza basilico\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "Crea un nuovo ordine. Restituisce il riepilogo dell'ordine creato."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has order code\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.code).to.be.a('string');",
+                  "    pm.environment.set('orderCode', json.code);",
+                  "    if (json.user && json.user.pickupFrom) pm.environment.set('pickupFrom', json.user.pickupFrom);",
+                  "    if (json.user && json.user.pickupTo) pm.environment.set('pickupTo', json.user.pickupTo);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Order - Lista ordini",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders?statuses=QUEUED&pickupDate={{pickupFrom}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"],
+              "query": [
+                { "key": "statuses", "value": "QUEUED" },
+                { "key": "pickupDate", "value": "{{pickupFrom}}" }
+              ]
+            },
+            "description": "Recupera tutti gli ordini, filtrabili per status e data ritiro."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is array\", function () {",
+                  "    pm.expect(Array.isArray(pm.response.json())).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Order - Dettaglio per ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{orderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{{orderId}}"]
+            },
+            "description": "Recupera i dettagli di un ordine tramite ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 o 404\", function () {",
+                  "    pm.expect([200,404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Order - Dettaglio per codice",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/by-code?code={{orderCode}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "by-code"],
+              "query": [
+                { "key": "code", "value": "{{orderCode}}" }
+              ]
+            },
+            "description": "Recupera i dettagli di un ordine tramite codice."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Order - Aggiorna ordine (utente)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"name\": \"Mario Rossi\",\n    \"pickupFrom\": \"{{pickupFrom}}\",\n    \"pickupTo\": \"{{pickupTo}}\"\n  },\n  \"pizzas\": [\n    {\n      \"pizzaId\": 1,\n      \"descriptionUser\": \"Margherita senza basilico\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/update?code={{orderCode}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "update"],
+              "query": [
+                { "key": "code", "value": "{{orderCode}}" }
+              ]
+            },
+            "description": "Aggiorna un ordine (solo se QUEUED)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Aggiorna variabili ordine\", function () {",
+                  "    var json = pm.response.json();",
+                  "    if (json.user && json.user.pickupFrom) pm.environment.set('pickupFrom', json.user.pickupFrom);",
+                  "    if (json.user && json.user.pickupTo) pm.environment.set('pickupTo', json.user.pickupTo);",
+                  "    if (json.code) pm.environment.set('orderCode', json.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Order - Aggiorna stato (pizzaiolo)",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/update-status?code={{orderCode}}&status=IN_PROGRESS",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "update-status"],
+              "query": [
+                { "key": "code", "value": "{{orderCode}}" },
+                { "key": "status", "value": "IN_PROGRESS" }
+              ]
+            },
+            "description": "Aggiorna lo stato di un ordine (solo pizzaiolo)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 o 404\", function () {",
+                  "    pm.expect([200,404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Order - Cancella ordine",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders?code={{orderCode}}&force=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"],
+              "query": [
+                { "key": "code", "value": "{{orderCode}}" },
+                { "key": "force", "value": "false" }
+              ]
+            },
+            "description": "Cancella un ordine. L'utente può cancellare solo se QUEUED, il pizzaiolo può forzare la cancellazione."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204 o 404\", function () {",
+                  "    pm.expect([204,404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pizza",
+      "description": "Tutte le API relative alle pizze (solo uso interno pizzeria).",
+      "item": [
+        {
+          "name": "Pizza - Crea pizza (interno)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Margherita 2.0\",\n  \"description\": \"Pomodoro *2, mozzarella*2, basilico*2\",\n  \"price\": 7.5,\n  \"ingredients\": [\n    { \"name\": \"pomodoro\" },\n    { \"name\": \"mozzarella\" },\n    { \"name\": \"basilico\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pizzas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pizzas"]
+            },
+            "description": "Crea una nuova pizza (solo uso interno pizzeria)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pizza - Lista pizze (interno)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/pizzas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pizzas"]
+            },
+            "description": "Recupera la lista di tutte le pizze (solo uso interno pizzeria)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pizza - Lista pizze per ID (interno)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[1,2,3]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pizzas/by-ids",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pizzas", "by-ids"]
+            },
+            "description": "Recupera la lista di pizze per lista di ID (solo uso interno pizzeria)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pizza - Aggiorna pizza (interno)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"name\": \"Margherita\",\n  \"description\": \"Pomodoro, mozzarella, basilico\",\n  \"price\": 8.5,\n  \"ingredients\": [\n    { \"id\": 1, \"name\": \"pomodoro\" },\n    { \"id\": 2, \"name\": \"mozzarella\" },\n    { \"id\": 3, \"name\": \"basilico\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pizzas/{{pizzaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pizzas", "{{pizzaId}}"]
+            },
+            "description": "Aggiorna una pizza (solo uso interno pizzeria)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 o 404\", function () {",
+                  "    pm.expect([200,404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pizza - Cancella pizza (interno)",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/pizzas/{{pizzaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pizzas", "{{pizzaId}}"]
+            },
+            "description": "Cancella una pizza (solo uso interno pizzeria)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204 o 404\", function () {",
+                  "    pm.expect([204,404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8090" },
+    { "key": "orderId", "value": "1" },
+    { "key": "orderCode", "value": "ORD-EXAMPLE" },
+    { "key": "pizzaId", "value": "1" },
+    { "key": "pickupFrom", "value": "2025-10-01T12:00:00" },
+    { "key": "pickupTo", "value": "2025-10-01T13:00:00" }
+  ]
+}
